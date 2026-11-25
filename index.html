@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Мой первый файл</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: system-ui, sans-serif;
+    }
+
+    body {
+      box-sizing: border-box;
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      min-height: 100svh;
+      margin: 0;
+      padding: 2rem 1.25rem;
+      background: radial-gradient(ellipse at 50% 36%, #252145, transparent 65%),
+                  linear-gradient(145deg, #080a14, #11172b);
+      color: #f5f2ff;
+    }
+
+    main {
+      width: min(100%, 61rem);
+      text-align: center;
+      animation: appear 950ms cubic-bezier(.2, .7, .25, 1) both;
+    }
+
+    h1 {
+      margin: 0 0 2rem;
+      font-size: clamp(1.9rem, 6vw, 5rem);
+      line-height: 1.08;
+      text-wrap: balance;
+      text-shadow: 0 0 1.5rem #b8a4ff55;
+    }
+
+    button {
+      padding: .85rem 1.65rem;
+      border: 1px solid #ddd2ff;
+      border-radius: 999px;
+      background: #c7b4ff;
+      color: #211537;
+      font: 700 1rem/1.25 system-ui, sans-serif;
+      cursor: pointer;
+      transition: background-color 160ms ease;
+    }
+
+    button:hover { background: #e0d5ff; }
+    button:focus-visible { outline: 2px solid white; outline-offset: 5px; }
+
+    #confetti {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .piece {
+      position: absolute;
+      width: 8px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      main { animation: none; }
+      button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Привет! Это мой первый файл, который собрал ИИ-агент</h1>
+    <button type="button">Нажми меня</button>
+  </main>
+  <div id="confetti" aria-hidden="true"></div>
+
+  <script>
+    const button = document.querySelector('button');
+    const confetti = document.querySelector('#confetti');
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const colors = ['#c7b4ff', '#68ebd5', '#ff92c4', '#ffd779', '#83caff'];
+
+    button.addEventListener('click', () => {
+      const bounds = button.getBoundingClientRect();
+      const originX = bounds.left + bounds.width / 2;
+      const originY = bounds.top + bounds.height / 2;
+      const gentle = reducedMotion.matches;
+      const spread = Math.min(innerWidth * .45, 360);
+
+      for (let i = 0; i < (gentle ? 24 : 64); i++) {
+        const piece = document.createElement('span');
+        const x = (Math.random() * 2 - 1) * spread;
+        const y = 55 + Math.random() * Math.min(innerHeight * .42, 280);
+        const turn = (Math.random() * 2 - 1) * 720;
+        piece.className = 'piece';
+        piece.style.left = `${originX}px`;
+        piece.style.top = `${originY}px`;
+        piece.style.backgroundColor = colors[i % colors.length];
+        confetti.append(piece);
+
+        const peak = `translate(${x * .65}px, ${-y}px) rotate(${turn * .5}deg)`;
+        const frames = gentle
+          ? [{ transform: peak, opacity: 1 }, { transform: peak, opacity: 0 }]
+          : [
+              { transform: 'translate(0, 0)', opacity: 1, easing: 'ease-out' },
+              { transform: peak, opacity: 1, offset: .45, easing: 'ease-in' },
+              { transform: `translate(${x}px, ${y * .8}px) rotate(${turn}deg)`, opacity: 0 },
+            ];
+        const animation = piece.animate(frames, gentle ? 420 : 850 + Math.random() * 450);
+        animation.onfinish = () => piece.remove();
+      }
+    });
+  </script>
+</body>
+</html>
